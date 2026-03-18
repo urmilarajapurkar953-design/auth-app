@@ -18,7 +18,8 @@
     },
     {
       "source": "/(.*)",
-      "destination": "client/$1"
+      "destination": "client/$1",
+      "check": true
     },
     {
       "source": "/(.*)",
