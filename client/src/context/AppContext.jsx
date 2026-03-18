@@ -5,8 +5,7 @@ export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
 
-  const backendURL = import.meta.env.VITE_BACKEND_URL || "";
-
+const backendURL = "";
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     try {
       const saved = localStorage.getItem('isLoggedIn');
