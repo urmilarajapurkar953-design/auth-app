@@ -10,27 +10,50 @@ dotenv.config();
 
 const app = express();
 
-// CORS should come first
+// 1. Connect to database immediately
+connectDB();
+
+// 2. Dynamic CORS Configuration
+const allowedOrigins = [
+    "http://localhost:5173", 
+    "http://localhost:5174", 
+    "http://localhost:5175",
+    process.env.FRONTEND_URL // This will be your Vercel URL
+];
+
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
-  credentials: true
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
 }));
 
+// 3. Middleware
 app.use(express.json());
 app.use(cookieParser());
 
-// Connect to database
-connectDB();
-
-// API endpoints
+// 4. API Endpoints
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 
 app.get("/", (req, res) => {
-  res.send("API Working");
+    res.send("API Working");
 });
 
+// 5. Port Configuration for local development
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+// ONLY start the server if we are NOT on Vercel
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+// 6. CRITICAL: Export for Vercel
+export default app;
